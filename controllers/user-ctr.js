@@ -35,13 +35,14 @@ const login = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("Email or password is wrong");
+  if (!user)
+    return res.status(400).send({ message: "Email or password is wrong" });
 
   const validPass = await bcrypt.compare(req.body.password, user.password);
-  if (!validPass) return res.status(400).send("Invalid password");
+  if (!validPass) return res.status(400).send({ message: "Invalid password" });
 
   const token = jwt.sign({ _id: user._id }, process.env.SECRET_TOKEN);
-  return res.header("auth-token", token).json(user);
+  return res.header("auth-token", token).json({ user, token });
 };
 
 module.exports = {
